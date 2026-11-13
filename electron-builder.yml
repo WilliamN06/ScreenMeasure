@@ -1,0 +1,34 @@
+﻿appId: com.screenmeasure.app
+productName: ScreenMeasure
+directories:
+  output: build
+  buildResources: assets
+files:
+  - out/**/*
+  - assets/**/*
+  - package.json
+win:
+  target:
+    - target: nsis
+      arch: [x64]
+  icon: assets/icon.ico
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+mac:
+  target: [dmg]
+  category: public.app-category.utilities
+  icon: assets/icon.icns
+  hardenedRuntime: true
+  gatekeeperAssess: false
+  entitlements: build/entitlements.mac.plist
+  extendInfo:
+    NSCameraUsageDescription: "Not used."
+    NSScreenCaptureUsageDescription: "ScreenMeasure needs screen recording to measure elements."
+linux:
+  target: [AppImage]
+  category: Utility
+  icon: assets/icon.png
