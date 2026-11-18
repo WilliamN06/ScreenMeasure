@@ -13,6 +13,9 @@ over a drawing canvas while you work.
 | **Open** | Press **Ctrl+Shift+M** from anywhere, or click the ScreenMeasure icon in the system tray. It also opens when you first start the app. |
 | **Close** | Press **Esc** (or the **✕** on the toolbar). If you're in the middle of something, Esc first cancels it, then deselects, then closes. |
 | **Quit** | Right-click the tray icon, then **Quit ScreenMeasure**. |
+| **Start it** | From the Start menu or the desktop shortcut, like any other app. |
+| **Start with Windows** | Right-click the tray icon and tick **Start with Windows**. It then waits in the tray after sign-in instead of covering your screen. |
+| **Updates** | Automatic. When a new version is ready you get a notification; click it (or **Restart to update** in the tray menu), or it updates next time you quit. The tray menu shows your version. |
 
 When the overlay is open you'll see a **thin teal border** around the screen and a **toolbar at
 the bottom**. Your screen stays exactly as it was, and the overlay just sits on top. While it's open,

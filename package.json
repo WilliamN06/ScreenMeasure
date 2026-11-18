@@ -1,9 +1,9 @@
 {
   "name": "screen-measure",
-  "version": "0.1.0",
-  "description": "Screenshot-based screen ruler with extended reference axes and automatic protractor.",
+  "version": "1.0.0",
+  "description": "On-screen ruler and protractor overlay for measuring and angling things on your screen.",
   "main": "./out/main/index.js",
-  "author": "Your Name",
+  "author": "WilliamN06",
   "license": "MIT",
   "scripts": {
     "dev": "electron-vite dev",
@@ -16,12 +16,16 @@
     "lint": "eslint . --ext .ts",
     "format": "prettier --write .",
     "package": "npm run build && electron-builder",
-    "package:win": "npm run build && electron-builder --win"
+    "package:win": "npm run build && electron-builder --win --publish never",
+    "icons": "node scripts/make-icons.mjs",
+    "install-app": "npm run package:win && node scripts/install-local.mjs",
+    "release": "npm run build && electron-builder --win --publish always"
   },
   "dependencies": {
-    "electron-squirrel-startup": "^1.0.0"
+    "electron-updater": "^6.3.9"
   },
   "devDependencies": {
+    "@resvg/resvg-js": "^2.6.2",
     "@testing-library/dom": "^10.4.2",
     "@types/node": "^20.11.30",
     "@typescript-eslint/eslint-plugin": "^7.4.0",
@@ -38,5 +42,9 @@
     "typescript": "^5.4.5",
     "vite": "^5.2.8",
     "vitest": "^1.6.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/WilliamN06/ScreenMeasure.git"
   }
 }

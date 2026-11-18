@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <!-- ScreenMeasure icon: two rulers hinged at a glowing pivot, with the protractor arc between them. -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1D2D4A"/>
+      <stop offset="1" stop-color="#0A101D"/>
+    </linearGradient>
+    <linearGradient id="teal" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0" stop-color="#14B8A6"/>
+      <stop offset="1" stop-color="#67E8F9"/>
+    </linearGradient>
+    <linearGradient id="amber" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0" stop-color="#F59E0B"/>
+      <stop offset="1" stop-color="#FDE68A"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#67E8F9" stop-opacity="0.85"/>
+      <stop offset="1" stop-color="#67E8F9" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="wedge" cx="0" cy="1" r="1">
+      <stop offset="0" stop-color="#F59E0B" stop-opacity="0.05"/>
+      <stop offset="1" stop-color="#F59E0B" stop-opacity="0.38"/>
+    </radialGradient>
+    <clipPath id="tile"><rect x="40" y="40" width="944" height="944" rx="210"/></clipPath>
+  </defs>
+
+  <rect x="40" y="40" width="944" height="944" rx="210" fill="url(#bg)"/>
+  <g clip-path="url(#tile)" opacity="0.09" stroke="#9FB4D9" stroke-width="4">
+    <path d="M40 296H984M40 552H984M40 808H984M296 40V984M552 40V984M808 40V984"/>
+  </g>
+
+  <!-- dashed guide: the horizontal ruler extended -->
+  <path clip-path="url(#tile)" d="M40 762H984" stroke="#67E8F9" stroke-opacity="0.35" stroke-width="8" stroke-dasharray="22 20"/>
+
+  <g transform="translate(46 -18)">
+
+    <!-- angle wedge + protractor arc -->
+    <path d="M250 780 L650 780 A400 400 0 0 0 496.3 464.8 Z" fill="url(#wedge)"/>
+    <path d="M650 780 A400 400 0 0 0 496.3 464.8" fill="none" stroke="url(#amber)" stroke-width="30" stroke-linecap="round"/>
+    <path d="M618.4 728.2L636.2 725.7M588.4 683.0L624.9 672.5M589.8 628.7L606.3 621.4M548.5 593.5L580.7 573.3M535.0 540.9L548.8 529.3M485.5 518.4L511.0 490.2"
+          stroke="#FCD34D" stroke-width="12" stroke-linecap="round"/>
+
+    <!-- horizontal ruler -->
+    <rect x="226" y="742" width="560" height="76" rx="24" fill="url(#teal)"/>
+    <path d="M330 742v24M410 742v40M490 742v24M570 742v40M650 742v24M730 742v40"
+          stroke="#0A101D" stroke-width="10" stroke-linecap="round" opacity="0.5"/>
+
+    <!-- angled ruler -->
+    <g transform="rotate(-52 250 780)">
+      <rect x="226" y="742" width="600" height="76" rx="24" fill="url(#teal)"/>
+      <path d="M330 818v-24M410 818v-40M490 818v-24M570 818v-40M650 818v-24M730 818v-40"
+            stroke="#0A101D" stroke-width="10" stroke-linecap="round" opacity="0.5"/>
+    </g>
+
+    <!-- pivot -->
+    <circle cx="250" cy="780" r="130" fill="url(#glow)"/>
+    <circle cx="250" cy="780" r="56" fill="#0A101D" stroke="#E6FFFB" stroke-width="18"/>
+    <circle cx="250" cy="780" r="17" fill="#E6FFFB"/>
+  </g>
+</svg>

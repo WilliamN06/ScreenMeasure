@@ -1,32 +1,39 @@
 ﻿appId: com.screenmeasure.app
 productName: ScreenMeasure
 directories:
-  output: build
+  output: dist
   buildResources: assets
 files:
   - out/**/*
-  - assets/**/*
+  - assets/*.png
   - package.json
+publish:
+  provider: github
+  owner: WilliamN06
+  repo: ScreenMeasure
+  releaseType: release
 win:
   target:
     - target: nsis
       arch: [x64]
   icon: assets/icon.ico
 nsis:
-  oneClick: false
+  # Installs per-user to %LOCALAPPDATA%\Programs\ScreenMeasure (no admin prompt) and adds
+  # Start menu + desktop shortcuts, like other apps. Updates reinstall silently.
+  oneClick: true
   perMachine: false
-  allowToChangeInstallationDirectory: true
   createDesktopShortcut: true
   createStartMenuShortcut: true
+  shortcutName: ScreenMeasure
+  runAfterFinish: true
+  artifactName: ScreenMeasure-Setup-${version}.${ext}
 mac:
   target: [dmg]
   category: public.app-category.utilities
-  icon: assets/icon.icns
+  icon: assets/icon.png
   hardenedRuntime: true
   gatekeeperAssess: false
-  entitlements: build/entitlements.mac.plist
   extendInfo:
-    NSCameraUsageDescription: "Not used."
     NSScreenCaptureUsageDescription: "ScreenMeasure needs screen recording to measure elements."
 linux:
   target: [AppImage]
