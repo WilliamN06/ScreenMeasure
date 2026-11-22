@@ -1,4 +1,4 @@
-﻿:root {
+:root {
   --accent: #00e5c3;
   --panel: rgba(22, 22, 26, 0.92);
   --panel-border: rgba(255, 255, 255, 0.1);
@@ -49,6 +49,8 @@ body.pinned #stage { pointer-events: none; }
 }
 .pill .dot { width: 8px; height: 8px; border-radius: 50%; flex: none; }
 .pill.selected { border-color: rgba(255, 255, 255, 0.45); }
+/* The relative-mode reference ruler ("1×"): outlined in its own colour so it reads as the unit. */
+.pill.reference { border-style: dashed; border-width: 1.5px; }
 .angle-label { padding: 2px 6px; font-size: 12px; }
 .spacing-label { color: #ffd60a; }
 

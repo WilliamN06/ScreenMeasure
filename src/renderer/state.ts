@@ -1,4 +1,4 @@
-﻿import type { Units } from './lib/format';
+import type { Measure, Units } from './lib/format';
 import { distance, samePoint } from './lib/geometry';
 import type { SnapKind } from './lib/snapping';
 import type { Spacing } from './lib/spacing';
@@ -35,6 +35,10 @@ export interface AppState {
   /** Show the loupe while hovering too (it is always shown while dragging). */
   loupeAlways: boolean;
   units: Units;
+  /** Relative mode: show lengths as multiples of the reference ruler instead of pixels. */
+  relative: boolean;
+  /** The reference ruler for relative mode; falls back to the first ruler when unset or deleted. */
+  referenceId: string | null;
   pinned: boolean;
   helpOpen: boolean;
   cursor: Point | null;
@@ -62,6 +66,8 @@ export function createInitialState(screenWidth: number, screenHeight: number): A
     snapEdges: true,
     loupeAlways: false,
     units: 'px',
+    relative: false,
+    referenceId: null,
     pinned: false,
     helpOpen: false,
     cursor: null,
@@ -196,4 +202,22 @@ export function resetForOpen(state: AppState, keepRulers: boolean): AppState {
 
 export function selectedRuler(state: AppState): Ruler | null {
   return state.rulers.find((r) => r.id === state.selectedId) ?? null;
+}
+
+/** The ruler that counts as "1×" in relative mode. */
+export function referenceRuler(state: AppState, rulers: readonly Ruler[] = state.rulers): Ruler | null {
+  return rulers.find((r) => r.id === state.referenceId) ?? rulers[0] ?? null;
+}
+
+/** How to print lengths right now. Pass the on-screen rulers so live edits of the reference count. */
+export function measureFor(state: AppState, rulers: readonly Ruler[] = state.rulers): Measure {
+  const ref = state.relative ? referenceRuler(state, rulers) : null;
+  const refLength = ref ? distance(ref.a, ref.b) : 0;
+  return { scale: state.scale, units: state.units, refLength: refLength > 0 ? refLength : null };
+}
+
+/** Make `id` the reference ruler, switching relative mode on. */
+export function setReference(state: AppState, id: string): AppState {
+  if (!state.rulers.some((r) => r.id === id)) return state;
+  return { ...state, relative: true, referenceId: id };
 }

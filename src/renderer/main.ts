@@ -1,4 +1,4 @@
-﻿import type { DisplayCapture, OpenPayload, ScreenMeasureAPI } from '../shared/ipc-types';
+import type { DisplayCapture, OpenPayload, ScreenMeasureAPI } from '../shared/ipc-types';
 
 import { attachKeyboardHandlers } from './interaction/keyboard';
 import { attachPointerHandlers } from './interaction/pointer';
@@ -23,7 +23,32 @@ const mod = isMac ? '⌘' : 'Ctrl';
 const stage = document.getElementById('stage')!;
 const ui = document.getElementById('ui')!;
 
-let state: AppState = createInitialState(window.innerWidth, window.innerHeight);
+// Toggle settings survive restarts (per machine; falls back to defaults if storage is unavailable).
+const SETTINGS_KEY = 'screenmeasure.settings';
+type Settings = Pick<AppState, 'snapEdges' | 'loupeAlways' | 'relative'>;
+function loadSettings(): Partial<Settings> {
+  try {
+    const raw = JSON.parse(localStorage.getItem(SETTINGS_KEY) ?? '{}') as Record<string, unknown>;
+    const out: Partial<Settings> = {};
+    for (const k of ['snapEdges', 'loupeAlways', 'relative'] as const) if (typeof raw[k] === 'boolean') out[k] = raw[k];
+    return out;
+  } catch {
+    return {};
+  }
+}
+let savedSettings = '';
+function saveSettings(st: AppState): void {
+  const json = JSON.stringify({ snapEdges: st.snapEdges, loupeAlways: st.loupeAlways, relative: st.relative });
+  if (json === savedSettings) return;
+  savedSettings = json;
+  try {
+    localStorage.setItem(SETTINGS_KEY, json);
+  } catch {
+    /* not persisted */
+  }
+}
+
+let state: AppState = { ...createInitialState(window.innerWidth, window.innerHeight), ...loadSettings() };
 let pixelSource: PixelSource | null = null;
 let image: HTMLCanvasElement | null = null;
 
@@ -36,6 +61,7 @@ function setState(next: AppState): void {
 function flush(): void {
   frame = 0;
   render(ctx, state, pixelSource, image);
+  saveSettings(state);
 }
 
 // ---- actions --------------------------------------------------------------------------------
@@ -58,6 +84,10 @@ const chrome = createChrome(
     toggleSnap: () => setState({ ...state, snapEdges: !state.snapEdges }),
     toggleLoupe: () => setState({ ...state, loupeAlways: !state.loupeAlways }),
     toggleUnits: () => setState({ ...state, units: state.units === 'px' ? 'physical' : 'px' }),
+    toggleRelative: () => {
+      setState({ ...state, relative: !state.relative });
+      if (state.relative && state.rulers.length > 0) toast('Relative — select a ruler and press B to change the reference');
+    },
     undo: () => setState(undo(state)),
     clear: () => {
       setState(clearAll(state));

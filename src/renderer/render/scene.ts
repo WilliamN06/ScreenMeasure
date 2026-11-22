@@ -1,10 +1,10 @@
-import { angleText, measurementText } from '../lib/format';
+import { angleText, measurementText, referenceText, sizeText } from '../lib/format';
 import { clipLineToRect, distance } from '../lib/geometry';
 import { arcLabelAnchor, arcPath, computeJoints } from '../lib/joints';
 import { placeLabel } from '../lib/layout';
 import { colorForIndex } from '../lib/palette';
 import type { Point, Rect, Ruler } from '../lib/types';
-import type { AppState } from '../state';
+import { measureFor, referenceRuler, type AppState } from '../state';
 
 import { clear, svgEl } from './svg';
 
@@ -84,6 +84,8 @@ export function renderScene(svg: SVGSVGElement, labels: HTMLElement, st: AppStat
   const g = st.gesture;
   const editing = !st.pinned;
   const tickStep = st.units === 'physical' ? 10 / st.scale : 10;
+  const measure = measureFor(st, rulers);
+  const refId = st.relative ? (referenceRuler(st, rulers)?.id ?? null) : null;
 
   // 1. Infinite guide lines (behind everything).
   for (const r of rulers) {
@@ -187,7 +189,13 @@ export function renderScene(svg: SVGSVGElement, labels: HTMLElement, st: AppStat
   const avoid = rulers.flatMap((r) => [r.a, r.b]);
   for (const r of rulers) {
     const color = colorForIndex(r.colorIndex);
-    const el = pill(labels, 'ruler-label', measurementText(r.a, r.b, st.scale, st.units), color);
+    const isRef = r.id === refId;
+    const text = isRef ? referenceText(r.a, r.b, measure) : measurementText(r.a, r.b, measure);
+    const el = pill(labels, 'ruler-label', text, color);
+    if (isRef) {
+      el.classList.add('reference');
+      el.style.borderColor = color;
+    }
     if (editing && (r.id === st.selectedId || r.id === PREVIEW_ID)) el.classList.add('selected');
     const w = el.offsetWidth || 120;
     const h = el.offsetHeight || 22;
@@ -208,13 +216,8 @@ export function renderScene(svg: SVGSVGElement, labels: HTMLElement, st: AppStat
   if (sp) {
     const w = sp.right - sp.left;
     const h = sp.bottom - sp.top;
-    const k = st.units === 'physical' ? st.scale : 1;
-    const el = pill(labels, 'spacing-label', `${fmtInt(w * k)} × ${fmtInt(h * k)}`, '#FFD60A');
+    const el = pill(labels, 'spacing-label', sizeText(w, h, measure), '#FFD60A');
     el.style.left = `${Math.min(W - 140, sp.origin.x + 10)}px`;
     el.style.top = `${Math.max(4, sp.origin.y - 30)}px`;
   }
-}
-
-function fmtInt(n: number): string {
-  return String(Math.round(n * 10) / 10);
 }

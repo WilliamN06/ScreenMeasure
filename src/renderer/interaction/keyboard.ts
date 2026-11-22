@@ -1,9 +1,12 @@
-﻿import { measurementText } from '../lib/format';
+import { measurementText, referenceText } from '../lib/format';
 import {
   deleteRuler,
+  measureFor,
   nudge,
   redo,
+  referenceRuler,
   selectedRuler,
+  setReference,
   toggleExtended,
   undo,
   type AppState,
@@ -79,9 +82,21 @@ export function attachKeyboardHandlers(deps: KeyboardDeps): () => void {
         if (sel) deps.setState(toggleExtended(st, sel.id));
         break;
       case '1':
-      case 'r':
         setTool(st, 'ruler');
         break;
+      case 'r':
+        deps.setState({ ...st, relative: !st.relative });
+        deps.toast(st.relative ? 'Showing pixels' : 'Relative: lengths × the reference ruler');
+        break;
+      case 'b': {
+        // Make the selected (or hovered) ruler the "1×" base.
+        const id = st.selectedId ?? st.hover?.id;
+        if (id) {
+          deps.setState(setReference(st, id));
+          deps.toast('Reference set — other rulers are now measured against it');
+        } else deps.toast('Select a ruler first, then press B to make it the reference');
+        break;
+      }
       case '2':
       case 's':
         if (st.hasCapture) setTool(st, 'spacing');
@@ -118,7 +133,9 @@ export function attachKeyboardHandlers(deps: KeyboardDeps): () => void {
       deps.toast('Nothing to copy yet');
       return;
     }
-    const text = measurementText(r.a, r.b, st.scale, st.units);
+    const m = measureFor(st);
+    const isRef = st.relative && referenceRuler(st)?.id === r.id;
+    const text = isRef ? referenceText(r.a, r.b, m) : measurementText(r.a, r.b, m);
     deps.copy(text);
     deps.toast(`Copied  ${text}`);
   }

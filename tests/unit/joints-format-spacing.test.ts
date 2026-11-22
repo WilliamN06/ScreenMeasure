@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
-import { deltaText, fmt, hexColor, measurementText } from '../../src/renderer/lib/format';
+import { deltaText, fmt, hexColor, measurementText, referenceText, sizeText, type Measure } from '../../src/renderer/lib/format';
+
+const px: Measure = { scale: 1, units: 'px', refLength: null };
 import { arcPath, computeJoints } from '../../src/renderer/lib/joints';
 import { makePixelSource } from '../../src/renderer/lib/snapping';
 import { scanSpacing } from '../../src/renderer/lib/spacing';
@@ -50,10 +52,19 @@ describe('format', () => {
     expect(fmt(-0.01)).toBe('0');
   });
   it('measurement text', () => {
-    expect(measurementText({ x: 0, y: 0 }, { x: 200, y: 0 }, 1, 'px')).toBe('200 px · 0°');
-    expect(measurementText({ x: 0, y: 0 }, { x: 200, y: 0 }, 1.5, 'physical')).toBe('300 phys px · 0°');
+    expect(measurementText({ x: 0, y: 0 }, { x: 200, y: 0 }, px)).toBe('200 px · 0°');
+    expect(measurementText({ x: 0, y: 0 }, { x: 200, y: 0 }, { scale: 1.5, units: 'physical', refLength: null })).toBe('300 phys px · 0°');
   });
-  it('delta text', () => expect(deltaText({ x: 0, y: 0 }, { x: -30, y: 40 }, 1, 'px')).toBe('Δx 30  Δy 40'));
+  it('delta text', () => expect(deltaText({ x: 0, y: 0 }, { x: -30, y: 40 }, px)).toBe('Δx 30  Δy 40'));
+  it('relative mode shows multiples of the reference length', () => {
+    const rel: Measure = { ...px, refLength: 200 };
+    expect(measurementText({ x: 0, y: 0 }, { x: 300, y: 0 }, rel)).toBe('1.5× · 0°');
+    expect(measurementText({ x: 0, y: 0 }, { x: 0, y: -100 }, rel)).toBe('0.5× · 90°');
+    expect(deltaText({ x: 0, y: 0 }, { x: 100, y: 50 }, rel)).toBe('Δx 0.5×  Δy 0.25×');
+    expect(sizeText(140, 44, rel)).toBe('0.7 × 0.22 ref');
+    expect(sizeText(140, 44, px)).toBe('140 × 44');
+    expect(referenceText({ x: 0, y: 0 }, { x: 200, y: 0 }, rel)).toBe('ref = 200 px · 0°');
+  });
   it('hex colour', () => expect(hexColor([30, 30, 46])).toBe('#1E1E2E'));
 });
 

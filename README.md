@@ -1,4 +1,4 @@
-﻿# ScreenMeasure
+# ScreenMeasure
 
 A ruler and protractor that sits on top of your screen. Measure UI, check angles, and pin guide
 lines over your drawing app.
@@ -21,6 +21,8 @@ Spacing tool, pinning guides while you draw, and troubleshooting.
 | Double-click a ruler / **E** | Extend it into an infinite guide line |
 | Right-click a ruler / **Del** | Delete it |
 | **2**, then hover | Spacing tool: size of the gap or element under the cursor, click to keep |
+| **R** | Relative mode: lengths as multiples of a reference ruler (e.g. `1.5×`) instead of pixels |
+| **B** | Make the selected ruler the reference (`1×`) |
 | **P** | Pin rulers on screen and keep drawing underneath (click-through) |
 | **Ctrl+C** | Copy the measurement |
 | **Ctrl+Z / Ctrl+Y** | Undo / redo (also brings back the last session's rulers) |

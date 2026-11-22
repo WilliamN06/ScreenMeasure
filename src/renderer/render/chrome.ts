@@ -7,6 +7,7 @@ export interface ChromeActions {
   toggleSnap(): void;
   toggleLoupe(): void;
   toggleUnits(): void;
+  toggleRelative(): void;
   undo(): void;
   clear(): void;
   pin(): void;
@@ -22,6 +23,8 @@ const ICONS = {
   spacing:
     '<svg viewBox="0 0 24 24"><path d="M4 4v16M20 4v16M7 12h10M7 12l3-3M7 12l3 3M17 12l-3-3M17 12l-3 3"/></svg>',
   snap: '<svg viewBox="0 0 24 24"><path d="M6 4v8a6 6 0 0 0 12 0V4"/><path d="M6 8h4M14 8h4"/></svg>',
+  relative:
+    '<svg viewBox="0 0 24 24"><path d="M3 8h8M3 16h18"/><path d="M3 5v6M11 5v6M3 13v6M21 13v6"/></svg>',
   loupe: '<svg viewBox="0 0 24 24"><circle cx="10" cy="10" r="6"/><path d="m15 15 5 5M10 7v6M7 10h6"/></svg>',
   undo: '<svg viewBox="0 0 24 24"><path d="M9 14 4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-3"/></svg>',
   clear: '<svg viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>',
@@ -72,12 +75,18 @@ export function createChrome(parent: HTMLElement, actions: ChromeActions, mod: s
     e.stopPropagation();
     actions.toggleUnits();
   });
+  const bRelative = btn(
+    'relative',
+    'Relative',
+    'Relative — show lengths as multiples of a reference ruler instead of pixels (R). Select a ruler and press B to make it the reference.',
+    actions.toggleRelative
+  );
   const bUndo = btn('undo', '', `Undo (${mod}+Z)`, actions.undo);
   const bClear = btn('clear', '', 'Clear all rulers', actions.clear);
   const bPin = btn('pin', 'Pin', 'Pin rulers on screen and draw underneath (P)', actions.pin);
   const bHelp = btn('help', '', 'Shortcuts (?)', actions.toggleHelp);
   const bClose = btn('close', '', 'Close (Esc)', actions.close);
-  toolbar.append(bRuler, bSpacing, sep(), bSnap, bLoupe, bUnits, sep(), bUndo, bClear, sep(), bPin, bHelp, bClose);
+  toolbar.append(bRuler, bSpacing, sep(), bSnap, bLoupe, bRelative, bUnits, sep(), bUndo, bClear, sep(), bPin, bHelp, bClose);
 
   const chip = div('pinned-chip');
   chip.innerHTML = `${ICONS.pin}<span>Pinned — click to edit</span><kbd>${mod}+Shift+M</kbd>`;
@@ -119,6 +128,7 @@ export function createChrome(parent: HTMLElement, actions: ChromeActions, mod: s
       bLoupe.disabled = !st.hasCapture;
       bUnits.hidden = Math.abs(st.scale - 1) < 0.01;
       bUnits.textContent = st.units === 'px' ? 'px' : `phys px ×${st.scale}`;
+      bRelative.classList.toggle('active', st.relative);
       bUndo.disabled = st.past.length === 0;
       bClear.disabled = st.rulers.length === 0;
       bPin.disabled = st.rulers.length === 0;
@@ -144,6 +154,12 @@ export function createChrome(parent: HTMLElement, actions: ChromeActions, mod: s
 function hintText(st: AppState, mod: string): string {
   if (st.pinned || st.helpOpen) return '';
   if (st.tool === 'spacing') return 'Hover a gap or element to see its size  ·  Click to keep it as rulers  ·  1 for the Ruler';
+  if (st.selectedId && st.relative) {
+    const isRef = (st.rulers.find((r) => r.id === st.referenceId) ?? st.rulers[0])?.id === st.selectedId;
+    return isRef
+      ? 'This is the reference (1×)  ·  Other rulers show multiples of it  ·  R back to pixels'
+      : 'B makes this ruler the reference (1×)  ·  Drag ends to adjust  ·  R back to pixels';
+  }
   if (st.selectedId) return `Drag ends to adjust  ·  Arrows nudge  ·  E extend line  ·  Del delete  ·  ${mod}+C copy`;
   if (st.rulers.length === 0) {
     const restore = st.past.length > 0 ? `  ·  ${mod}+Z brings back your last rulers` : '';
@@ -167,6 +183,8 @@ function helpHtml(mod: string): string {
     [`${mod}+Z / ${mod}+Y`, 'Undo / redo'],
     ['1 / 2', 'Ruler / Spacing tool'],
     ['G · L · U', 'Snap · Loupe · Units'],
+    ['R', 'Relative: lengths as multiples of a reference ruler'],
+    ['B', 'Make the selected ruler the reference (1×)'],
     ['P', 'Pin rulers on screen — draw underneath them'],
     [`${mod}+Shift+M`, 'Open / close from anywhere'],
     ['Esc', 'Cancel → deselect → close'],

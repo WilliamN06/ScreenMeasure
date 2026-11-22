@@ -1,7 +1,9 @@
-import { deltaText, fmt, hexColor, measurementText } from '../lib/format';
+import { deltaText, fmt, hexColor, measurementText, referenceText, sizeText } from '../lib/format';
 import type { PixelSource } from '../lib/snapping';
 import type { Point } from '../lib/types';
-import type { AppState } from '../state';
+import { measureFor, referenceRuler, type AppState } from '../state';
+
+import { displayedRulers } from './scene';
 
 /**
  * The cursor card: a pixel loupe plus live numbers. Shown while drawing/adjusting (where
@@ -58,12 +60,18 @@ export function renderHud(hud: Hud, st: AppState, src: PixelSource | null, image
 
   if (g?.kind === 'create' || g?.kind === 'handle') {
     const anchor = g.kind === 'create' ? g.start : g.anchor;
-    hud.main.textContent = measurementText(anchor, g.current, st.scale, st.units);
-    hud.sub.textContent = [deltaText(anchor, g.current, st.scale, st.units), SNAP_TEXT[g.snap]].filter(Boolean).join('  ·  ');
+    const shown = displayedRulers(st);
+    const m = measureFor(st, shown);
+    const ref = st.relative ? referenceRuler(st, shown) : null;
+    // Drawing or adjusting the reference itself: show its real size (it is "1×" by definition).
+    const isRef = ref !== null && (g.kind === 'create' ? st.rulers.length === 0 : g.handles.some((h) => h.id === ref.id));
+    hud.main.textContent = isRef ? referenceText(anchor, g.current, m) : measurementText(anchor, g.current, m);
+    hud.sub.textContent = [deltaText(anchor, g.current, isRef ? { ...m, refLength: null } : m), SNAP_TEXT[g.snap]]
+      .filter(Boolean)
+      .join('  ·  ');
   } else if (st.tool === 'spacing' && st.spacing) {
-    const k = st.units === 'physical' ? st.scale : 1;
     const s = st.spacing;
-    hud.main.textContent = `${fmt((s.right - s.left) * k)} × ${fmt((s.bottom - s.top) * k)}`;
+    hud.main.textContent = sizeText(s.right - s.left, s.bottom - s.top, measureFor(st));
     hud.sub.textContent = 'click to keep as rulers';
   } else {
     hud.main.textContent = '';

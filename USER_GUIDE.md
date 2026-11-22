@@ -83,6 +83,18 @@ You can join three or more rulers at one point. Each neighbouring pair gets its 
 | **Ctrl+Z / Ctrl+Y** | Undo / redo anything |
 | Toolbar trash icon | Clears all rulers (undoable) |
 
+### Relative measurements (proportions)
+
+For drawing, the proportion often matters more than the pixels: *"the head is 1/7 of the body"*.
+Press **R** (or click **Relative** on the toolbar) to switch every length from pixels to a
+multiple of a **reference ruler**:
+
+- The reference ruler's label shows `ref = 243 px` with a dashed outline. That length is `1×`.
+- Every other ruler shows how many times longer it is, e.g. `1.5× · 0°` or `0.25× · 90°`.
+- The reference is the first ruler you drew. To use a different one, **click it and press B**.
+- Δx/Δy in the loupe and the Spacing tool's size (`0.7 × 0.22 ref`) are relative too.
+- Press **R** again to go back to pixels. The setting is remembered next time you open the app.
+
 ---
 
 ## 5. Measuring UI: the Spacing tool
@@ -121,6 +133,7 @@ Use this to keep guide lines visible while you draw or design in another app.
 | Spacing | 2 | Hover to measure elements and gaps |
 | Snap | G | Snap to edges on screen (Alt = bypass for a moment) |
 | Loupe | L | Keep the magnifier on while hovering, not just while dragging |
+| Relative | R | Show lengths as multiples of a reference ruler instead of pixels (B sets the reference) |
 | px / phys px | U | Only on displays scaled above 100%: switch between screen pixels and physical pixels |
 | ↶ | Ctrl+Z | Undo |
 | 🗑 | | Clear all rulers |

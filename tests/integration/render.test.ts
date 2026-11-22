@@ -1,7 +1,7 @@
-﻿import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 import { createRenderContext, render } from '../../src/renderer/render/index';
-import { addRuler, createInitialState } from '../../src/renderer/state';
+import { addRuler, createInitialState, setReference } from '../../src/renderer/state';
 
 describe('render pipeline (jsdom smoke)', () => {
   let stage: HTMLDivElement;
@@ -67,5 +67,23 @@ describe('render pipeline (jsdom smoke)', () => {
     });
     expect(stage.querySelectorAll('.ruler-line').length).toBe(1);
     expect(stage.querySelectorAll('.snap-mark').length).toBe(1);
+  });
+
+  it('relative mode: first ruler is the reference, others are multiples of it', () => {
+    let s = addRuler(createInitialState(800, 600), { x: 100, y: 100 }, { x: 300, y: 100 });
+    s = addRuler(s, { x: 100, y: 200 }, { x: 400, y: 200 });
+    const ctx = createRenderContext(stage);
+    render(ctx, { ...s, relative: true });
+    let labels = [...stage.querySelectorAll('.ruler-label')].map((l) => l.textContent);
+    expect(labels).toEqual(['ref = 200 px · 0°', '1.5× · 0°']);
+    expect(stage.querySelectorAll('.ruler-label.reference').length).toBe(1);
+
+    render(ctx, setReference(s, s.rulers[1]!.id));
+    labels = [...stage.querySelectorAll('.ruler-label')].map((l) => l.textContent);
+    expect(labels).toEqual(['0.67× · 0°', 'ref = 300 px · 0°']);
+
+    render(ctx, { ...s, relative: false });
+    labels = [...stage.querySelectorAll('.ruler-label')].map((l) => l.textContent);
+    expect(labels).toEqual(['200 px · 0°', '300 px · 0°']);
   });
 });
