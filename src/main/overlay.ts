@@ -128,9 +128,20 @@ export async function enterEdit(): Promise<void> {
   }
 }
 
+/** True while nothing is on screen (not measuring, nothing pinned): a safe moment to update. */
+export function overlayIdle(): boolean {
+  return mode === 'hidden' && !busy;
+}
+
+let onHidden: () => void = () => {};
+export function setOnOverlayHidden(cb: () => void): void {
+  onHidden = cb;
+}
+
 export function hideOverlay(): void {
   mode = 'hidden';
   for (const o of overlays.values()) o.win.hide();
+  onHidden();
 }
 
 export function pin(): void {
